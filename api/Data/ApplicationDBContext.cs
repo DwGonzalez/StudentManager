@@ -16,6 +16,10 @@ namespace api.Data
 
         }
 
-
+        public DbSet<Class> Class { get; set; }
+        public DbSet<Attendance> Attendance { get; set; }
+        public DbSet<StudentAttendance> StudentAttendance { get; set; }
+        public DbSet<StudentClass> StudentClass { get; set; }
+        public DbSet<TeacherClass> TeacherClass { get; set; }
     }
 }
