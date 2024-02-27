@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace api.Migrations
 {
     /// <inheritdoc />
-    public partial class Classes : Migration
+    public partial class ClassesFix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,50 +25,17 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attendance",
+                name: "Student",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ClassId = table.Column<int>(type: "int", nullable: false)
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Attendance", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Attendance_Class_ClassId",
-                        column: x => x.ClassId,
-                        principalTable: "Class",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StudentClass",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClassId = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Score = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StudentClass", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StudentClass_AspNetUsers_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_StudentClass_Class_ClassId",
-                        column: x => x.ClassId,
-                        principalTable: "Class",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_Student", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -98,28 +65,56 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentAttendance",
+                name: "Attendance",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AttendanceId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClassId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
                     IsPresent = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentAttendance", x => x.Id);
+                    table.PrimaryKey("PK_Attendance", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StudentAttendance_AspNetUsers_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "AspNetUsers",
+                        name: "FK_Attendance_Class_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Class",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_StudentAttendance_Attendance_AttendanceId",
-                        column: x => x.AttendanceId,
-                        principalTable: "Attendance",
+                        name: "FK_Attendance_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Student",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentClass",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClassId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    Score = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentClass", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StudentClass_Class_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Class",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentClass_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Student",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -130,13 +125,8 @@ namespace api.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StudentAttendance_AttendanceId",
-                table: "StudentAttendance",
-                column: "AttendanceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_StudentAttendance_StudentId",
-                table: "StudentAttendance",
+                name: "IX_Attendance_StudentId",
+                table: "Attendance",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
@@ -164,7 +154,7 @@ namespace api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StudentAttendance");
+                name: "Attendance");
 
             migrationBuilder.DropTable(
                 name: "StudentClass");
@@ -173,7 +163,7 @@ namespace api.Migrations
                 name: "TeacherClass");
 
             migrationBuilder.DropTable(
-                name: "Attendance");
+                name: "Student");
 
             migrationBuilder.DropTable(
                 name: "Class");

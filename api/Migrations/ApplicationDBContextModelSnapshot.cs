@@ -234,9 +234,17 @@ namespace api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsPresent")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ClassId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Attendance");
                 });
@@ -258,7 +266,7 @@ namespace api.Migrations
                     b.ToTable("Class");
                 });
 
-            modelBuilder.Entity("api.Models.StudentAttendance", b =>
+            modelBuilder.Entity("api.Models.Student", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -266,23 +274,17 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AttendanceId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsPresent")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("StudentId")
+                    b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttendanceId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("StudentAttendance");
+                    b.ToTable("Student");
                 });
 
             modelBuilder.Entity("api.Models.StudentClass", b =>
@@ -299,9 +301,8 @@ namespace api.Migrations
                     b.Property<int>("Score")
                         .HasColumnType("int");
 
-                    b.Property<string>("StudentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -395,24 +396,13 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("api.Models.StudentAttendance", b =>
-                {
-                    b.HasOne("api.Models.Attendance", "Attendance")
-                        .WithMany()
-                        .HasForeignKey("AttendanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("api.Models.AppUser", "Student")
+                    b.HasOne("api.Models.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Attendance");
+                    b.Navigation("Class");
 
                     b.Navigation("Student");
                 });
@@ -425,7 +415,7 @@ namespace api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api.Models.AppUser", "Student")
+                    b.HasOne("api.Models.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
