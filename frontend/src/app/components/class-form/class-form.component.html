@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">{{ title }}</h4>
+  <button
+    type="button"
+    class="btn-close close pull-right"
+    aria-label="Close"
+    (click)="cancel()"
+  >
+    <span aria-hidden="true" class="visually-hidden">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="">
+    <div class="">
+      <form [formGroup]="classGroup">
+        <div class="mb-3">
+          <label for="name" class="form-label">Class Name:</label>
+          <input
+            maxlength="20"
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="cancel()">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-success" (click)="save()">Save</button>
+</div>
