@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using api.Data;
 using api.Dtos.Class;
 using api.Dtos.Student;
+using api.Interfaces;
 using api.Mappers;
 using api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -15,25 +17,27 @@ namespace api.Controllers
     [ApiController]
     public class ClassController : ControllerBase
     {
-        private readonly ApplicationDBContext _context;
+        private readonly IClassRepository _repository;
+        private readonly IStudentRepository _studentRepository;
 
-        public ClassController(ApplicationDBContext context)
+        public ClassController(IClassRepository repository, IStudentRepository studentRepository)
         {
-            _context = context;
+            _repository = repository;
+            _studentRepository = studentRepository;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var classes = _context.Class.ToList();
+            var classes = await _repository.GetAllAsync();
 
             return Ok(classes);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById([FromRoute] int id)
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var course = _context.Class.Find(id);
+            var course = await _repository.GetByIdAsync(id);
 
             if (course == null)
             {
@@ -44,64 +48,100 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] CreateClassRequestDto classDto)
+        public async Task<IActionResult> Create([FromBody] CreateClassRequestDto classDto)
         {
             var classModel = classDto.ToClassFromCreateDto();
 
-            _context.Class.Add(classModel);
-            _context.SaveChanges();
+            await _repository.CreateAsync(classModel);
 
             return CreatedAtAction(nameof(GetById), new { id = classModel.Id }, classModel.ToClassDto());
         }
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult Update([FromRoute] int id, [FromBody] UpdateClassRequestDto updateDto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateClassRequestDto updateDto)
         {
-            var classModel = _context.Class.FirstOrDefault(x => x.Id == id);
+            var classModel = await _repository.UpdateAsync(id, updateDto);
 
             if (classModel == null)
             {
                 return NotFound();
             }
 
-            classModel.Name = updateDto.Name;
-
-            _context.SaveChanges();
-
             return Ok(classModel.ToClassDto());
         }
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            var course = _context.Class.Find(id);
+            var course = await _repository.DeleteAsync(id);
             if (course == null)
             {
                 return NotFound();
             }
 
-            _context.Class.Remove(course);
-            _context.SaveChanges();
-
             return NoContent();
         }
 
         [HttpPost]
-        [Route("addStudentsToClass")]
-        public IActionResult AddStudentsToClass([FromBody] List<AddStudentToClassRequestDto> studentsDto)
+        [Route("{id}/addToClass")]
+        public async Task<IActionResult> AddStudentsToClass([FromRoute] int id, [FromBody] List<AddStudentToClassRequestDto> studentsDto)
         {
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
             var students = new List<StudentClass>();
 
             foreach (var st in studentsDto)
             {
-                students.Add(st.ToStudentClassFromCreateDto());
+                students.Add(st.ToStudentClassFromCreateDto(id));
             }
 
-            _context.StudentClass.AddRange(students);
-            _context.SaveChanges();
+            await _repository.AddStudentsToClass(id, students);
 
+            // await _context.StudentClass.AddRangeAsync(students);
+            // await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("{id}/students")]
+        public async Task<IActionResult> GetClassStudents([FromRoute] int id)
+        {
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            var students = await _studentRepository.GetStudentsFromClass(id);
+
+            // var studentsDto = students.Select(s => s.ToStudentClassFromStudentDto());
+
+            return Ok(students);
+        }
+
+        [HttpPut]
+        [Route("{id}/assign-score")]
+        public async Task<IActionResult> AssignStudentScore([FromRoute] int id, AssignScoreRequest request)
+        {
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("{id}/get-attendance")]
+        public async Task<IActionResult> GetAttendance([FromRoute] int id)
+        {
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("{id}/create-attendance")]
+        public async Task<IActionResult> CreateAttendance([FromRoute] int id)
+        {
             return Ok();
         }
     }

@@ -27,11 +27,11 @@ namespace api.Mappers
             };
         }
 
-        public static StudentClass ToStudentClassFromCreateDto(this AddStudentToClassRequestDto studentModel)
+        public static StudentClass ToStudentClassFromCreateDto(this AddStudentToClassRequestDto studentModel, int classId)
         {
             return new StudentClass
             {
-                ClassId = studentModel.ClassId,
+                ClassId = classId,
                 StudentId = studentModel.StudentId
             };
         }
