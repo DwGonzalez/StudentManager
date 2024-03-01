@@ -1,0 +1,70 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">{{ title }}</h4>
+  <button
+    type="button"
+    class="btn-close close pull-right"
+    aria-label="Close"
+    (click)="cancel()"
+  >
+    <span aria-hidden="true" class="visually-hidden">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="">
+    <div class="">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Selection</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{
+            selectedStudents
+          }}
+          <tr *ngFor="let student of studentList; let i = index">
+            <td>{{ student.id }}</td>
+            <td>{{ student.firstName + " " + student.lastName }}</td>
+            <td>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  value="student.id"
+                  type="checkbox"
+                  id="flexCheckDefault"
+                  [(ngModel)]="selectedStudents[student.id]"
+                />
+                <label class="form-check-label" for="flexCheckDefault">
+                  Select
+                </label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- <div *ngIf="!studentList?.length" class="row">
+        <p>No Data</p>
+      </div> -->
+      <!-- <form [formGroup]="studentFormGroup">
+        <div class="mb-3">
+          <label for="firstName" class="form-label">First Name:</label>
+          <input
+            maxlength="20"
+            type="text"
+            class="form-control"
+            id="firstName"
+            formControlName="firstName"
+          />
+        </div>
+      </form> -->
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="cancel()">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-success" (click)="save()">Save</button>
+</div>

@@ -29,4 +29,30 @@ export class ClassService {
   updateClass(id: number, newClass: any): Observable<any> {
     return this.http.put(`/api/class/${id}`, newClass);
   }
+
+  getStudentsClass(id: number): Observable<any> {
+    return this.http.get(`/api/class/${id}/students`);
+  }
+
+  assignScoreToStudent(id: number, request: any): Observable<any> {
+    return this.http.put(`/api/class/${id}/assign-score`, request);
+  }
+
+  getAttendanceList(classId: number): Observable<any> {
+    return this.http.get(`/api/class/${classId}/get-attendance-list`);
+  }
+
+  removeStudentFromClass(classId: number, studentId: number): Observable<any> {
+    return this.http.delete(
+      `/api/class/${classId}/student-from-class?studentId=${studentId}`
+    );
+  }
+
+  getStudentsNotInClass(classId: number): Observable<any> {
+    return this.http.get(`/api/class/${classId}/students-not-in-class`);
+  }
+
+  addStudentsToClass(classId: number, request: any): Observable<any> {
+    return this.http.post(`/api/class/${classId}/addToClass`, request);
+  }
 }
