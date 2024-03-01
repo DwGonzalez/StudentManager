@@ -81,5 +81,46 @@ namespace api.Repository
 
             return students;
         }
+
+        public async Task<bool> AssignScore(int classId, AssignScoreRequest request)
+        {
+            var score = await _context.StudentClass.FirstOrDefaultAsync(sc => sc.ClassId == classId && sc.StudentId == request.StudentId);
+
+            if (score == null)
+                return false;
+
+            score.Score = request.Score;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<List<Student>> GetStudentsNotInClass(int classId)
+        {
+            var students = await _context.Student.Where(st => !_context.StudentClass.Any(sc => sc.ClassId == classId && sc.StudentId == st.Id)).Select(s => new
+            Student
+            {
+                Id = s.Id,
+                FirstName = s.FirstName,
+                LastName = s.LastName
+            }).ToListAsync();
+
+            return students;
+        }
+
+        public async Task<StudentClass?> RemoveStudentFromClass(int classId, int studentId)
+        {
+            var studentInClass = await _context.StudentClass.FirstOrDefaultAsync(sc => sc.ClassId == classId && sc.StudentId == studentId);
+
+            if (studentInClass == null)
+                return null;
+
+            _context.StudentClass.Remove(studentInClass);
+            await _context.SaveChangesAsync();
+
+            return studentInClass;
+        }
+
     }
 }

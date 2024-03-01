@@ -28,6 +28,12 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Libraries
 
-npm install ngx-toastr --save
-ng add ngx-bootstrap
-npm install sweetalert2
+` npm install ngx-toastr --save`
+
+`ng add ngx-bootstrap`
+
+`npm install sweetalert2 `
+
+`npm install ngx-pipes --save`
+
+`npm install ngx-pagination --save`

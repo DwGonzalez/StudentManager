@@ -1,5 +1,5 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ClassService } from '../class.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -10,17 +10,26 @@ import { HttpClientModule } from '@angular/common/http';
 
 import Swal from 'sweetalert2';
 import { ToastrService } from 'ngx-toastr';
+import { NgArrayPipesModule } from 'ngx-pipes';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { AttendanceListComponent } from '../../components/attendance-list/attendance-list.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterModule, HttpClientModule],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.css',
   providers: [BsModalService],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HttpClientModule,
+    FormsModule,
+    NgArrayPipesModule,
+    NgxPaginationModule,
+  ],
 })
 export class LandingComponent implements OnInit {
-  isModelOpen = false;
   modalRef?: BsModalRef;
   modalConfig = {
     backdrop: true,
@@ -29,18 +38,16 @@ export class LandingComponent implements OnInit {
   };
 
   loading: boolean = true;
-  filter: FormControl;
   classes!: Array<any>;
   classesListTitle: string = 'Classes List';
+  classFilter: string = '';
+  page = 1;
 
   constructor(
-    private fb: FormBuilder,
     private classService: ClassService,
     private modalService: BsModalService,
     private toast: ToastrService
-  ) {
-    this.filter = this.fb.control('', { nonNullable: true });
-  }
+  ) {}
 
   ngOnInit() {
     this.getAllClasses();
@@ -103,6 +110,22 @@ export class LandingComponent implements OnInit {
       console.log('saved too');
       this.getAllClasses();
     });
+  }
+
+  attendanceListModal(template: TemplateRef<void>, classId: number) {
+    const initialState: ModalOptions = {
+      backdrop: true,
+      ignoreBackdropClick: true,
+      class: 'modal-dialog-centered modal-lg',
+      initialState: {
+        title: 'Attendance List',
+        classId: classId,
+      },
+    };
+    this.modalRef = this.modalService.show(
+      AttendanceListComponent,
+      initialState
+    );
   }
 
   openModal2(template: TemplateRef<void>) {

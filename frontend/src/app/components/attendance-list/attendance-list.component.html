@@ -1,0 +1,91 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">{{ title }}</h4>
+  <button
+    type="button"
+    class="btn-close close pull-right"
+    aria-label="Close"
+    (click)="cancel()"
+  >
+    <span aria-hidden="true" class="visually-hidden">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="row">
+    <div class="col d-flex justify-content-end mb-2">
+      <button type="button" class="btn btn-sm btn-primary">Create New</button>
+    </div>
+  </div>
+  <div class="">
+    <div class="">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Attendance Date</th>
+            <!-- <th scope="col">Present</th> -->
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <tr>
+            <td>1</td>
+            <td>dadwa</td>
+            <td>10 / 20</td>
+            <td>
+              <div class="justify-content-evenly">
+                <button type="button" class="btn btn-sm btn-success">
+                  View
+                </button>
+                <button type="button" class="btn btn-sm btn-info">Edit</button>
+                <button type="button" class="btn btn-sm btn-danger">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr> -->
+          <tr *ngFor="let attendance of attendanceList; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ attendance.createdDate | date }}</td>
+            <td>
+              <div class="d-flex justify-content-evenly">
+                <button type="button" class="btn btn-sm btn-success">
+                  <!-- (click)="
+                    addScoreModal(
+                      template,
+                      student.classId,
+                      student.score,
+                      student.id
+                    )
+                  " -->
+                  View
+                </button>
+                <!-- <button type="button" class="btn btn-sm btn-info">Edit</button> -->
+                <button type="button" class="btn btn-sm btn-danger">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- <form [formGroup]="classGroup">
+        <div class="mb-3">
+          <label for="name" class="form-label">Class Name:</label>
+          <input
+            maxlength="20"
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+          />
+        </div>
+      </form> -->
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="cancel()">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-success" (click)="save()">Save</button>
+</div>
