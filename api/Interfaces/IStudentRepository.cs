@@ -17,5 +17,8 @@ namespace api.Interfaces
         Task<Student?> DeleteAsync(int id);
         Task<bool> StudentExists(int id);
         Task<List<GetStudentClassInfo>> GetStudentsFromClass(int classId);
+        Task<bool> AssignScore(int classId, AssignScoreRequest request);
+        Task<List<Student>> GetStudentsNotInClass(int classId);
+        Task<StudentClass?> RemoveStudentFromClass(int classId, int studentId);
     }
 }

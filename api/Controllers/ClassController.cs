@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.Dtos.Attendance;
 using api.Dtos.Class;
 using api.Dtos.Student;
 using api.Interfaces;
@@ -19,11 +20,13 @@ namespace api.Controllers
     {
         private readonly IClassRepository _repository;
         private readonly IStudentRepository _studentRepository;
+        private readonly IAttendanceRepository _attendanceRepository;
 
-        public ClassController(IClassRepository repository, IStudentRepository studentRepository)
+        public ClassController(IClassRepository repository, IStudentRepository studentRepository, IAttendanceRepository attendanceRepository)
         {
             _repository = repository;
             _studentRepository = studentRepository;
+            _attendanceRepository = attendanceRepository;
         }
 
         [HttpGet]
@@ -102,9 +105,6 @@ namespace api.Controllers
 
             await _repository.AddStudentsToClass(id, students);
 
-            // await _context.StudentClass.AddRangeAsync(students);
-            // await _context.SaveChangesAsync();
-
             return Ok();
         }
 
@@ -119,30 +119,108 @@ namespace api.Controllers
 
             var students = await _studentRepository.GetStudentsFromClass(id);
 
-            // var studentsDto = students.Select(s => s.ToStudentClassFromStudentDto());
+            return Ok(students);
+        }
+
+        [HttpGet]
+        [Route("{id}/students-not-in-class")]
+        public async Task<IActionResult> GetStudentsNotInClass([FromRoute] int id)
+        {
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            var students = await _studentRepository.GetStudentsNotInClass(id);
 
             return Ok(students);
+        }
+
+        [HttpDelete]
+        [Route("{id}/student-from-class")]
+        public async Task<IActionResult> DeleteStudentFromClass([FromRoute] int id, int studentId)
+        {
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            if (!await _studentRepository.StudentExists(studentId))
+            {
+                return BadRequest("Student does not exist");
+            }
+
+            var student = await _studentRepository.RemoveStudentFromClass(id, studentId);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
 
         [HttpPut]
         [Route("{id}/assign-score")]
         public async Task<IActionResult> AssignStudentScore([FromRoute] int id, AssignScoreRequest request)
         {
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            var score = await _studentRepository.AssignScore(id, request);
+
             return Ok();
         }
 
         [HttpGet]
-        [Route("{id}/get-attendance")]
+        [Route("{id}/get-attendance-details")]
         public async Task<IActionResult> GetAttendance([FromRoute] int id)
         {
-            return Ok();
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            var attendance = await _attendanceRepository.GetAttendanceDetailsAsync(id);
+
+            return Ok(attendance.Select(a => a.ToDtoFromAttendance(id)).ToList());
+        }
+
+        [HttpGet]
+        [Route("{id}/get-attendance-list")]
+        public async Task<IActionResult> GetAttendanceList([FromRoute] int id)
+        {
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            var attendance = await _attendanceRepository.GetAttendanceAsync(id);
+
+            return Ok(attendance.Distinct());
         }
 
         [HttpPost]
         [Route("{id}/create-attendance")]
-        public async Task<IActionResult> CreateAttendance([FromRoute] int id)
+        public async Task<IActionResult> CreateAttendance([FromRoute] int id, [FromBody] List<CreateAttendanceDto> request)
         {
-            return Ok();
+            if (!await _repository.ClassExists(id))
+            {
+                return BadRequest("Class does not exist");
+            }
+
+            var attendanceList = new List<Attendance>();
+
+            foreach (var at in request)
+            {
+                attendanceList.Add(at.ToAttendanceFromCreateDto(id));
+            }
+
+            var attendance = await _attendanceRepository.CreateAttendanceAsync(id, attendanceList);
+
+            return Ok(attendance.Select(a => a.ToDtoFromAttendance(id)).ToList());
         }
     }
 }
